@@ -1,33 +1,28 @@
 
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Gallery from "./pages/Gallery";
-import NotFound from "./pages/NotFound";
+import { ThemeProvider } from "next-themes";
 
+import Gallery from "@/pages/Gallery";
+import AlbumView from "@/pages/AlbumView";
+import NotFound from "@/pages/NotFound";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-
+function App() {
+  return (
+    <ThemeProvider defaultTheme="light" attribute="class">
+      <Router>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Navigate to="/gallery" replace />} />
           <Route path="/gallery" element={<Gallery />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/album/:id" element={<AlbumView />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      </Router>
+      <Toaster />
+    </ThemeProvider>
+  );
+}
 
 export default App;

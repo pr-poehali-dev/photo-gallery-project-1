@@ -5,8 +5,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import Icon from "@/components/ui/icon";
 import AlbumCard from "@/components/AlbumCard";
+import { useNavigate } from "react-router-dom";
 
-interface Album {
+export interface Album {
   id: string;
   name: string;
   coverImage: string;
@@ -15,6 +16,7 @@ interface Album {
 const Gallery = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [gridColumns, setGridColumns] = useState<number>(4);
+  const navigate = useNavigate();
 
   const createAlbum = () => {
     const newAlbum: Album = {
@@ -37,7 +39,17 @@ const Gallery = () => {
     setGridColumns(value[0]);
   };
 
-  const gridClasses = `grid grid-cols-${gridColumns} gap-4`;
+  const updateAlbumName = (id: string, newName: string) => {
+    setAlbums((prevAlbums) =>
+      prevAlbums.map((album) =>
+        album.id === id ? { ...album, name: newName } : album
+      )
+    );
+  };
+
+  const openAlbum = (id: string) => {
+    navigate(`/album/${id}`);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -45,7 +57,7 @@ const Gallery = () => {
         <h1 className="text-3xl font-bold">Фотогалерея</h1>
         <div className="flex gap-4">
           <Button onClick={createAlbum} className="bg-primary">
-            <Icon name="Plus" />
+            <Icon name="Plus" className="mr-2" />
             Создать альбом
           </Button>
           <Button 
@@ -53,7 +65,7 @@ const Gallery = () => {
             variant="destructive" 
             disabled={albums.length === 0}
           >
-            <Icon name="Trash2" />
+            <Icon name="Trash2" className="mr-2" />
             Удалить все
           </Button>
         </div>
@@ -66,6 +78,7 @@ const Gallery = () => {
             <div className="w-1/3">
               <Slider
                 defaultValue={[4]}
+                value={[gridColumns]}
                 min={3}
                 max={8}
                 step={1}
@@ -81,12 +94,19 @@ const Gallery = () => {
         </CardContent>
       </Card>
 
-      <div className={`grid grid-cols-3 sm:grid-cols-4 md:grid-cols-${gridColumns} gap-4`}>
+      <div 
+        className="grid gap-4" 
+        style={{ 
+          gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))` 
+        }}
+      >
         {albums.map((album) => (
           <AlbumCard 
             key={album.id} 
             album={album} 
             onDelete={() => deleteAlbum(album.id)}
+            onNameChange={(newName) => updateAlbumName(album.id, newName)}
+            onOpen={() => openAlbum(album.id)}
           />
         ))}
       </div>
