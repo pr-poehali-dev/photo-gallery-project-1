@@ -21,15 +21,59 @@ const AlbumView = () => {
   const [gridColumns, setGridColumns] = useState<number>(4);
   const [gapSize, setGapSize] = useState<number>(4);
 
-  // В реальном приложении здесь был бы запрос к API для получения данных
+  // Загрузка данных из localStorage при монтировании компонента
   useEffect(() => {
-    // Имитация получения данных альбома из хранилища
-    setAlbum({
-      id: id || "",
-      name: "Мой альбом",
-      coverImage: "https://source.unsplash.com/random/300x300?album"
-    });
-  }, [id]);
+    // Загрузка альбома
+    const savedAlbums = localStorage.getItem("albums");
+    if (savedAlbums && id) {
+      const parsedAlbums: Album[] = JSON.parse(savedAlbums);
+      const foundAlbum = parsedAlbums.find(album => album.id === id);
+      if (foundAlbum) {
+        setAlbum(foundAlbum);
+      } else {
+        // Если альбом не найден, перенаправляем на галерею
+        navigate("/gallery");
+      }
+    } else if (!id) {
+      navigate("/gallery");
+    }
+
+    // Загрузка фотографий для этого альбома
+    const savedPhotos = localStorage.getItem(`photos_${id}`);
+    if (savedPhotos) {
+      setPhotos(JSON.parse(savedPhotos));
+    }
+
+    // Загрузка настроек отображения
+    const savedGridColumns = localStorage.getItem(`gridColumns_${id}`);
+    if (savedGridColumns) {
+      setGridColumns(Number(savedGridColumns));
+    }
+
+    const savedGapSize = localStorage.getItem(`gapSize_${id}`);
+    if (savedGapSize) {
+      setGapSize(Number(savedGapSize));
+    }
+  }, [id, navigate]);
+
+  // Сохранение данных в localStorage при изменении
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem(`photos_${id}`, JSON.stringify(photos));
+    }
+  }, [photos, id]);
+
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem(`gridColumns_${id}`, String(gridColumns));
+    }
+  }, [gridColumns, id]);
+
+  useEffect(() => {
+    if (id) {
+      localStorage.setItem(`gapSize_${id}`, String(gapSize));
+    }
+  }, [gapSize, id]);
 
   const addPhoto = () => {
     const newPhoto: Photo = {

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
@@ -17,6 +17,28 @@ const Gallery = () => {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [gridColumns, setGridColumns] = useState<number>(4);
   const navigate = useNavigate();
+
+  // Загрузка данных из localStorage при монтировании компонента
+  useEffect(() => {
+    const savedAlbums = localStorage.getItem("albums");
+    if (savedAlbums) {
+      setAlbums(JSON.parse(savedAlbums));
+    }
+    
+    const savedGridColumns = localStorage.getItem("gridColumns");
+    if (savedGridColumns) {
+      setGridColumns(Number(savedGridColumns));
+    }
+  }, []);
+
+  // Сохранение данных в localStorage при изменении
+  useEffect(() => {
+    localStorage.setItem("albums", JSON.stringify(albums));
+  }, [albums]);
+
+  useEffect(() => {
+    localStorage.setItem("gridColumns", String(gridColumns));
+  }, [gridColumns]);
 
   const createAlbum = () => {
     const newAlbum: Album = {
